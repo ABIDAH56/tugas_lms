@@ -16,7 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from lms_app.apiv1 import apiv1
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/v1/', apiv1.urls),
 ]

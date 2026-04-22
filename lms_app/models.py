@@ -42,4 +42,13 @@ class Enrollment(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     class Meta:
-        unique_together = ('student', 'course') # Constraint Unique
+        unique_together = ('student', 'course') # Constraint Unique#
+
+class LessonProgress(models.Model):
+    student = models.ForeignKey(User, on_delete=models.CASCADE)
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name='progress_records')
+    is_completed = models.BooleanField(default=False)
+    completed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('student', 'lesson')
