@@ -1,7 +1,10 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
+from ninja import FilterSchema, Field
 from typing import List, Optional
 
-# --- Schema User (Nested) ---
+# ==========================================
+# SCHEMA: USER (NESTED)
+# ==========================================
 class UserOut(BaseModel):
     id: int
     username: str
@@ -9,41 +12,54 @@ class UserOut(BaseModel):
     last_name: str
     email: str
 
-    # Pastikan class Config menjorok ke dalam (di dalam class UserOut)
     class Config:
         from_attributes = True
         
-# --- Schema Category ---
+# ==========================================
+# SCHEMA: CATEGORY
+# ==========================================
 class CategoryOut(BaseModel):
     id: int
     name: str
 
-    # Tambahkan class Config di sini juga
     class Config:
         from_attributes = True
 
-# --- Schema Course ---
+# ==========================================
+# SCHEMA: COURSE
+# ==========================================
 class CourseIn(BaseModel):
-    # Tambahkan min_length=1 agar tidak boleh kosong
     title: str = Field(..., min_length=1, example="Pemrograman Web")
     category_id: int = Field(..., example=1)
     is_active: bool = True
 
+class CoursePatchIn(BaseModel):
+    title: Optional[str] = Field(None, min_length=1, example="Pemrograman Web")
+    category_id: Optional[int] = Field(None, example=1)
+    is_active: Optional[bool] = None
+
 class CourseOut(BaseModel):
     id: int
     title: str
-    instructor: UserOut  # Nested Schema
+    instructor: UserOut
     category: CategoryOut
     is_active: bool
 
     class Config:
         from_attributes = True
 
-# --- Schema CourseContent (Lesson) ---
+# ==========================================
+# SCHEMA: COURSE CONTENT (LESSON)
+# ==========================================
 class LessonIn(BaseModel):
     title: str = Field(..., example="Pengenalan REST API")
     order: int = Field(default=1, example=1)
     course_id: int
+
+class LessonPatchIn(BaseModel):
+    title: Optional[str] = Field(None, example="Pengenalan REST API")
+    order: Optional[int] = Field(None, example=1)
+    course_id: Optional[int] = None
 
 class LessonOut(BaseModel):
     id: int
@@ -53,3 +69,10 @@ class LessonOut(BaseModel):
 
     class Config:
         from_attributes = True
+        
+# ==========================================
+# SCHEMA TAMBAHAN: FILTERING & SEARCHING
+# ==========================================
+class CourseFilter(FilterSchema):
+    search: Optional[str] = Field(None, q=['title__icontains'])
+    is_active: Optional[bool] = None
